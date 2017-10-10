@@ -72,7 +72,8 @@ tar xfz master.tar.gz
 ENV CPPFLAGS="-I/usr/kerberos/include"
 ENV OPENSSL_VERSION 1.0.2l-1~bpo8+1
 
-RUN tar xfz master.tar.gz \
+RUN wget "$COSIGN_URL" \ 
+    tar xfz master.tar.gz \
     cd cosign-master \
     autoconf \ 
     ./configure --enable-apache2=`which apxs` \
