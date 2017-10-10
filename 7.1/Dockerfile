@@ -46,18 +46,17 @@ RUN yum install -y autoconf httpd-devel openssl-devel wget
 
 WORKDIR /usr/local/apache2
 ENV COSIGN_URL https://github.com/umich-iam/cosign/archive/master.tar.gz
-tar xfz master.tar.gz
 ENV CPPFLAGS="-I/usr/kerberos/include"
 ENV OPENSSL_VERSION 1.0.2l-1~bpo8+1
 
-RUN wget "$COSIGN_URL" \ 
-    tar xfz master.tar.gz \
-    cd cosign-master \
-    autoconf \ 
-    ./configure --enable-apache2=`which apxs` \
-    make install \
-    mkdir -p /var/cosign/filter \
-    chown apache:apache /var/cosign/filter \
+RUN wget "$COSIGN_URL" && \ 
+    tar xfz master.tar.gz &&\
+    cd cosign-master &&\
+    autoconf &&\ 
+    ./configure --enable-apache2=`which apxs` &&\
+    make install &&\
+    mkdir -p /var/cosign/filter &&\
+    chown apache:apache /var/cosign/filter &&\
     yum clean all -y
 
 # Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
