@@ -41,6 +41,25 @@ RUN yum install -y centos-release-scl && \
     rpm -V $INSTALL_PKGS && \
     yum clean all -y
 
+# Install cosign
+RUN yum install -y autoconf httpd-devel openssl-devel wget
+
+WORKDIR /usr/local/apache2
+ENV COSIGN_URL https://github.com/umich-iam/cosign/archive/master.tar.gz
+tar xfz master.tar.gz
+ENV CPPFLAGS="-I/usr/kerberos/include"
+ENV OPENSSL_VERSION 1.0.2l-1~bpo8+1
+
+RUN wget "$COSIGN_URL" \ 
+    tar xfz master.tar.gz \
+    cd cosign-master \
+    autoconf \ 
+    ./configure --enable-apache2=`which apxs` \
+    make install \
+    mkdir -p /var/cosign/filter \
+    chown apache:apache /var/cosign/filter \
+    yum clean all -y
+
 # Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
 COPY ./s2i/bin/ $STI_SCRIPTS_PATH
 
@@ -62,24 +81,6 @@ RUN sed -i -f /opt/app-root/etc/httpdconf.sed /opt/rh/httpd24/root/etc/httpd/con
     chmod -R a+rwx /opt/rh/httpd24/root/var/run/httpd
 
 USER 1001
-
-# Install cosign
-RUN yum install -y autoconf httpd-devel openssl-devel wget
-
-WORKDIR /usr/local/apache2
-ENV COSIGN_URL https://github.com/umich-iam/cosign/archive/master.tar.gz
-tar xfz master.tar.gz
-ENV CPPFLAGS="-I/usr/kerberos/include"
-ENV OPENSSL_VERSION 1.0.2l-1~bpo8+1
-
-RUN wget "$COSIGN_URL" \ 
-    tar xfz master.tar.gz \
-    cd cosign-master \
-    autoconf \ 
-    ./configure --enable-apache2=`which apxs` \
-    make install \
-    mkdir -p /var/cosign/filter \
-    chown apache:apache /var/cosign/filter
 
 
 # Set the default CMD to print the usage of the language image
