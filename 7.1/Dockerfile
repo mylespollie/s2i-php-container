@@ -4,6 +4,7 @@ FROM centos/s2i-base-centos7
 # applications.
 
 EXPOSE 8080
+EXPOSE 443
 
 ENV PHP_VERSION=7.1 \
     PATH=$PATH:/opt/rh/rh-php71/root/usr/bin
@@ -61,6 +62,24 @@ RUN sed -i -f /opt/app-root/etc/httpdconf.sed /opt/rh/httpd24/root/etc/httpd/con
     chmod -R a+rwx /opt/rh/httpd24/root/var/run/httpd
 
 USER 1001
+
+# Install cosign
+RUN yum install -y autoconf httpd-devel openssl-devel wget
+
+WORKDIR /usr/local/apache2
+ENV COSIGN_URL https://github.com/umich-iam/cosign/archive/master.tar.gz
+tar xfz master.tar.gz
+ENV CPPFLAGS="-I/usr/kerberos/include"
+ENV OPENSSL_VERSION 1.0.2l-1~bpo8+1
+
+RUN tar xfz master.tar.gz \
+    cd cosign-master \
+    autoconf \ 
+    ./configure --enable-apache2=`which apxs` \
+    make install \
+    mkdir -p /var/cosign/filter \
+    chown apache:apache /var/cosign/filter
+
 
 # Set the default CMD to print the usage of the language image
 CMD $STI_SCRIPTS_PATH/usage
