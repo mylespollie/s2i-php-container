@@ -61,7 +61,7 @@ RUN sed -i -f /opt/app-root/etc/httpdconf.sed /opt/rh/httpd24/root/etc/httpd/con
     chmod -R a+rwx /etc/opt/rh/rh-php71 && \
     chmod -R a+rwx /opt/rh/httpd24/root/var/run/httpd && \
     chown -R 1001:0 /tmp && \
-    chmod -R a+rwx /tmp && \ 
+    chmod -R a+rwx /tmp 
     
 USER 1001
 
