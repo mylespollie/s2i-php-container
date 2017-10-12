@@ -58,6 +58,8 @@ RUN wget "$COSIGN_URL" && \
     mkdir -p /var/cosign/filter &&\
     chown apache:apache /var/cosign/filter &&\
     yum clean all -y
+    
+WORKDIR /
 
 # Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
 COPY ./s2i/bin/ $STI_SCRIPTS_PATH
